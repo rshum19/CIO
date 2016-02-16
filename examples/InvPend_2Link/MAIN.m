@@ -1,6 +1,5 @@
-% PURPOSE: Performance a contact invariant optimization of a 3 link 
-%          inverted pendulum model of a bipedal robot
-% FILENAME: MAIN.m
+% PURPOSE:  
+% FILENAME: .m
 % AUTHOR:   Roberto Shu
 % LAST EDIT: 
 %------------------- Instructions ---------------------------
@@ -19,8 +18,8 @@ addpath(genpath('../../'));
 %   MODEL PROPERTIES
 %   Intialize your dynamic model parameter values and dyanmics
 % -----------------------------------------------------------
-OCP.model.params = params_hopper_1D_model;
-OCP.model.dynamics = @(t,x,u,lambda)hopper_1D_DynamicsWrapper(t,x,u,lambda,OCP.model.params);
+OCP.model.params = params_invPend_2DoF;
+OCP.model.dynamics = @(t,x,u)invPend_Dynamics(t,x,u,OCP.model.params);
 
 %% ----------------------------------------------------------
 %   DEFINE OCP PROBLEM PROPERTIES
@@ -28,10 +27,9 @@ OCP.model.dynamics = @(t,x,u,lambda)hopper_1D_DynamicsWrapper(t,x,u,lambda,OCP.m
 
 % COST/OBJECTIVE FUNCTIONS
 % ------------------------
-% e.g.
-%   Step cost: OCP.pathCostFnc = @(t,x,u)model_pathcostFnc(t,x,u, OCP.model.params);
-%   Terminal cost: OCP.bndCostFnc = @(t,x,u)model_bndcostFnc(t,x,u, OCP.model.params);
-OCP.pathCostFnc = @(t,x,u)hopper_1D_costFnc(t,x,u,OCP.model.params);
+%OCP.costFnc = @(t,x,u)invPend_CostFnc(t,x,u, OCP.model.params);
+% Need to change to have the above format
+OCP.pathCostFnc = @(t,x,u)(u.^2);
 OCP.bndCostFnc = [];
 
 % INITIAL GUESS
@@ -46,89 +44,64 @@ OCP.options.IGtype = 'linear';
 
 % Time span
 t0 = 0;
-tF = 2;
+tF = 2.5;
 OCP.ig.time = [t0,tF];
 
 % State 
-% x0, xF:   state vector [q;dq] => [2*n X 1] column vector
-%   [y; l; dy; dl];
-%  
-l0 = OCP.model.params.l0;
-x0 = [1.3*l0; 1*l0; 0; 0; 0; 0];
-xF = [1.3*l0; 1*l0; 0; 0; 0; 0];
+stepAngle = 0.2;
+stepRate = (2*stepAngle)/(tF-t0);
+x0 = [-stepAngle; stepAngle; stepRate; -stepRate];
+xF = [stepAngle; -stepAngle; stepRate; -stepRate];
 OCP.ig.state = [x0,xF];
 
 % Control
-ul = [0.1;0.1];
-OCP.ig.control = ul;
-
-% Contact forces
-% For a given contact point i, the contact force is
-%   lambda_i = [lambdaX_i;lambdaZ_i]
-% expressed in a frame with X tangent and Z normal to 
-% the contact surface.
-% If there are m contact points then 
-%   lambda = [m x 2]
-lambda0 = [0;0];
-lambdaF = [0;0];
-OCP.ig.lambda = [lambda0, lambdaF];
+u0 = 0;
+uF = 0;
+OCP.ig.control = [u0,uF];
 
 % CONSTRAINTS & BOUNDARIES
 % ------------------------
  
 % Nonlinear constraints
-% e.g.
-%   OCP.pathCst = @(t,x,u)pathCst(z);
-%   OCP.bndCst = @(t0,x0,u0,tF,xF,uF)bndCst(z);
-%   OCP.compCst = @(t0,x0,u0,tF,xF,uF)compCst(z);
+%OCP.pathCst = @(t,x,u)pathCst(z);
+%OCP.bndCst = @(t0,x0,u0,tF,xF,uF)bndCst(z);
 OCP.pathCst = [];
-OCP.bndCst = @(t,x,u)hopper_1D_bndCst(t,x,u,OCP.model.params);
-OCP.compCst = @(Phi,Gamma,t,x,u,lambda)hopper_1D_compCst(Phi,Gamma,t,x,u,lambda,OCP.model.params);
+OCP.bndCst = [];
 
 % You can let time to be free by not setting any bounds on the final time
 OCP.bounds.initTime.lb = t0;
 OCP.bounds.initTime.ub = t0;
-OCP.bounds.finalTime.lb = t0+0.1;
-OCP.bounds.finalTime.ub = tF*6;
+OCP.bounds.finalTime.lb = tF;
+OCP.bounds.finalTime.ub = tF;
 
 % State:
-%   [y; l; ul; dy; dl; ul];
+%   [q1; q2; dq1; dq2];
 %  
-OCP.bounds.state.lb = [0; 0; -inf(4,1)]; 
-OCP.bounds.state.ub = inf(6,1);
-OCP.bounds.initState.lb = [1.3*l0; 1*l0; -inf(4,1)];
-OCP.bounds.initState.ub = [1.3*l0; 1*l0; inf(4,1)];
-OCP.bounds.finalState.lb = [0; 0; -inf(4,1)];
-OCP.bounds.finalState.ub = inf(6,1);
+OCP.bounds.state.lb = [-2*pi; -2*pi; -inf(2,1)]; % Change to so they are set from the model parameters
+OCP.bounds.state.ub = [2*pi; 2*pi; inf(2,1)];
+OCP.bounds.initState.lb = [pi; pi; 0; 0];
+OCP.bounds.initState.ub = [pi; pi; 0; 0];
+OCP.bounds.finalState.lb = zeros(4,1);
+OCP.bounds.finalState.ub = zeros(4,1);
 
-% Control:
-%%TODO
-% Change so they are set from model parametes
-maxTau = 0.5*l0; 
-OCP.bounds.control.lb = 0; 
-OCP.bounds.control.ub = maxTau;
-
-% Contact forces:
-OCP.bounds.lambda.lb = -inf(2,1);
-OCP.bounds.lambda.ub = inf(2,1);
+maxTorque = 25; 
+OCP.bounds.control.lb = -maxTorque; % Change so they are set from model parametes
+OCP.bounds.control.ub = maxTorque;
 
 %% ----------------------------------------------------------
 %   SOLVER OPTIONS
 % -----------------------------------------------------------
 
-%%% TODO
-% add capability for other methods
-%method = 'euler';
-method = 'euler_mod';
+method = 'euler';
 % method = 'trapezoidal';
 % method = 'hermiteSimpson';
 
 OCP.options.method = method;
-OCP.options.nGrid = 50;
+OCP.options.nGrid = 15;
 
 % For a full list of options refer to :
 %   http://www.mathworks.com/help/optim/ug/fmincon.html#inputarg_options
-%%% TODO setting options here is not working need to see why
+
 OCP.options.fminOpt.MaxFunEval = 1e5;
 
 %% ----------------------------------------------------------
@@ -141,46 +114,36 @@ tGrid = soln(end).grid.time;
 t = linspace(tGrid(1),tGrid(end),100);
 z = soln(end).interp.state(t);
 u = soln(end).interp.control(t);
-guess = soln(end).guess;
+
 
 %% ----------------------------------------------------------
 %   PLOT RESULTS
 % -----------------------------------------------------------
 dyn = OCP.model.params;
 
-% Initial guess
 figure
 subplot(3,1,1)
-plot(guess.time,guess.state(1,:))
+plot(t,z(1:2,:));
+legend('joint 1','joint 2')
 xlabel('Time [sec]');
-ylabel('Mass M1 height [m]');
+ylabel('Angle [rad]');
 
 subplot(3,1,2)
-plot(guess.time,guess.state(4,:))
+plot(t,z(3:4,:));
+legend('joint 1','joint 2')
 xlabel('Time [sec]');
-ylabel('Mass M1 velocity [m/sec]');
-
-figure
-subplot(3,1,1)
-plot(t,z(1,:));
-xlabel('Time [sec]');
-ylabel('Mass M1 height [m]');
-
-subplot(3,1,2)
-plot(t,z(4,:));
-xlabel('Time [sec]');
-ylabel('Mass M1 velocity [m/sec]');
+ylabel('Angle rate [rad/sec]');
 
 subplot(3,1,3)
-plot(t,u,t,z(3,:))
+plot(t,u)
 xlabel('Time [sec]');
 ylabel('U control input');
 
 % Animate the results:
-% A.plotFunc = @(t,z)( drawModel(t,z,dyn) );
-% A.speed = 0.25;
-% A.figNum = 101;
-% animate(t,z,A)
+A.plotFunc = @(t,z)( drawInvPend2(t,z,dyn) );
+A.speed = 0.25;
+A.figNum = 101;
+animate(t,z,A)
 
 %%% TODO
 % Draw a stop-action animation:

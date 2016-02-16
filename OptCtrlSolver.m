@@ -15,8 +15,8 @@ nGrid = OCP.options.nGrid;
 %% ----------------------------------------------------------
 %   FORMAT INITIAL GUESS
 % -----------------------------------------------------------
-switch OCP.options.IGtype
-    case 'linear'
+%switch OCP.options.IGtype
+    %case 'linear'
         % Interpolate the guess at the grid-points for transcription:
         guess.tSpan = IG.time([1,end]);
         guess.time = linspace(guess.tSpan(1), guess.tSpan(2), nGrid);
@@ -26,14 +26,14 @@ switch OCP.options.IGtype
         % Mux intial guess
         [q0, packSize] = mux(guess.time,guess.state,guess.control,guess.lambda);
 
-    case 'custom'
+    %case 'custom'
         % Mux intial guess
-        guess = IG;
-        [q0, packSize] = mux(IG.time,IG.state,IG.control,IG.lambda);
+        %guess = IG;
+        %[q0, packSize] = mux(IG.time,IG.state,IG.control,IG.lambda);
     
-    otherwise
-        error('Invalid initial guess type)');
-end
+    %otherwise
+        %error('Invalid initial guess type)');
+%end
 
 %% ----------------------------------------------------------
 %   COST/OBJECTIVE FUNCTION
@@ -95,7 +95,7 @@ P.ub = ub;
 P.Aineq = []; P.bineq = [];
 P.Aeq = []; P.beq = [];
 
-P.options = optimoptions('fmincon','Display','iter','MaxIter',1e4,'MaxFunEval',1e6,'TolFun',1e-4);
+P.options = optimoptions('fmincon','Display','iter','Algorithm','sqp','MaxIter',1e4,'MaxFunEval',1e6,'TolFun',1e-4);
 
 %P.options = OPT.fminOpt;
 P.solver = 'fmincon';
@@ -201,10 +201,9 @@ lambdaX = lambda(1:packSize.nLambda/2,:);
 lambdaY = lambda(1+packSize.nLambda/2:end,:);
 % S.T. Dynamic's constraints
 %   This is method specific
-
 % Numerically evaluate dynamics 
 dt = (t(end)-t(1))/(length(t)-1);
-[f, Phi, Gamma] = dynamics(t,x,u,lambdaY);
+[f, Phi, Psi] = dynamics(t,x,u,lambdaY);
 
 % Compute defects
 ceq_dyn = defects(dt,x,f); 
@@ -216,8 +215,6 @@ if isempty(bndCst);
     ceq_bnd = [];
 else
     [c_bnd, ceq_bnd] = bndCst(t,x,u);
-    c_bnd = c_bnd;
-    ceq_bnd = ceq_bnd;
 end
 
 % S.T. Path
@@ -226,8 +223,6 @@ if isempty(pathCst)
     ceq_path = [];
 else
     [c_path, ceq_path] = pathCst(t,x,u);
-    c_path = c_path;
-    ceq_path = ceq_path;
 end
 
 % S.T. Complimetary Constraints
@@ -235,7 +230,7 @@ if isempty(compCst)
     c_comp = [];
     ceq_comp = [];
 else
-    [c_comp, ceq_comp] = compCst(Phi,Gamma,t,x,u,lambda);
+    [c_comp, ceq_comp] = compCst(Phi,Psi,t,x,u,lambda);
 end
 
 % Costruct constraints vectors
