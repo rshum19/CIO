@@ -30,7 +30,7 @@ OCP.model.dynamics = @(t,x,u,lambda)fallingBox_dynamics(t,x,lambda,OCP.model.par
 %   Step cost: OCP.pathCostFnc = @(t,x,u)model_pathcostFnc(t,x,u, OCP.model.params);
 %   Terminal cost: OCP.bndCostFnc = @(t,x,u)model_bndcostFnc(t,x,u, OCP.model.params);
 OCP.pathCostFnc = [];
-OCP.bndCostFnc = @(t,x,u)fallingBox_costFnc(t,x,u,OCP.model.params);;
+OCP.bndCostFnc = @(t,x,u)fallingBox_costFnc(t,x,u,OCP.model.params);
 
 % INITIAL GUESS
 % ------------------------
@@ -40,7 +40,6 @@ OCP.bndCostFnc = @(t,x,u)fallingBox_costFnc(t,x,u,OCP.model.params);;
 %   custom: The user provides a custom initial guess "shape". 
 %           NOTE: custom initial guess has to be descritized with the same
 %           size than OCP.options.nGrid
-options.IGtype = 'linear';
 
 % Load initial guess
 data = load('fallingBox_data.mat');
@@ -113,7 +112,7 @@ OCP.bounds.finalState.ub = [20; 50; inf(2,1)];
 % Change so they are set from model parametes
 maxTau = 500;
 OCP.bounds.control.lb = 0; 
-OCP.bounds.control.ub = maxTau;
+OCP.bounds.control.ub = 0;
 
 % Contact forces:
 OCP.bounds.lambda.lb = -inf(2,1);
