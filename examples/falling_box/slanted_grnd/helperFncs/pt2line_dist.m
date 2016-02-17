@@ -10,6 +10,11 @@ a = l(1);
 b = l(2);
 c = l(3);
 
-dist = abs(a*x + b*y + c)/sqrt(a^2 + b^2);
+if all(l == 0)
+    dist = y;
+else
+    dist = abs(a*x + b*y + c)/sqrt(a^2 + b^2);
+end
+
 end
 

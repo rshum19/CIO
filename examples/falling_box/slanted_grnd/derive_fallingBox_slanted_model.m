@@ -55,9 +55,12 @@ Vcom= jacobian(Pcom,q)*dq;
 Vbtm = jacobian(Pcom,q)*dq;
 
 % Contact penetration distance
-phi1 = pt2line_dist(Pc1,line);
-phi2 = pt2line_dist(Pc2,line);
-phi3 = pt2line_dist(Pc3,line);
+%phi1 = pt2line_dist(Pc1,line);
+%phi2 = pt2line_dist(Pc2,line);
+%phi3 = pt2line_dist(Pc3,line);
+phi1 = y - h/2;
+phi2 = y - h/2;
+phi3 = y - h/2;
 
 Phi = [phi1;phi2;phi3];
 
@@ -93,7 +96,7 @@ params_list = {'w','h',...
                'g'};
            
 q_list = {'x','y','th'};
-dq_list = {'dq1','dq2'};
+dq_list = {'dx','dy','dth'};
 u_list = {'u1'};
 line_coeff = {'a','b','c'};
 
@@ -104,8 +107,8 @@ matlabFunction(Pc1,Pc2,Pc3,'File',fullfile(autoFolderName,'autogen_contact_pts.m
                 'outputs',{'pc1','pc2','pc3'});
            
 matlabFunction(Phi,Psi,J,'File',fullfile(autoFolderName,'autogen_contactDyn.m'),...
-                'vars',horzcat(q_list,params_list,line_coeff),...
-                'outputs',{'pc1','pc2','pc3'});
+                'vars',horzcat(q_list,dq_list,params_list,line_coeff),...
+                'outputs',{'Phi','Psi','J'});
 
 
 

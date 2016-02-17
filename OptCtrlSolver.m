@@ -182,13 +182,13 @@ end
 
 function [c, ceq] = myConstraints (z,packSize,defects,dynamics,pathCst,bndCst,compCst)
 
-% Unmux state
+%---- Unmux state
 [t,x,u,lambda] = unMux(z, packSize);
 
 lambdaX = lambda(1:packSize.nLambda/2,:);
 lambdaY = lambda(1+packSize.nLambda/2:end,:);
-% S.T. Dynamic's constraints
-%   This is method specific
+
+%---- S.T. Dynamic's constraints
 % Numerically evaluate dynamics 
 dt = (t(end)-t(1))/(length(t)-1);
 [f, Phi, Psi] = dynamics(t,x,u,lambdaY);
@@ -197,7 +197,7 @@ dt = (t(end)-t(1))/(length(t)-1);
 ceq_dyn = defects(dt,x,f); 
 ceq_dyn = reshape(ceq_dyn,numel(ceq_dyn),1);
 
-% S.T. Nonlinear Boundary
+%---- S.T. Nonlinear Boundary
 if isempty(bndCst);
     c_bnd = [];
     ceq_bnd = [];
@@ -205,7 +205,7 @@ else
     [c_bnd, ceq_bnd] = bndCst(t,x,u);
 end
 
-% S.T. Path
+%---- S.T. Path
 if isempty(pathCst)
     c_path = [];
     ceq_path = [];
@@ -213,7 +213,7 @@ else
     [c_path, ceq_path] = pathCst(t,x,u);
 end
 
-% S.T. Complimetary Constraints
+%---- S.T. Complimetary Constraints
 if isempty(compCst)
     c_comp = [];
     ceq_comp = [];
@@ -221,7 +221,7 @@ else
     [c_comp, ceq_comp] = compCst(Phi,Psi,t,x,u,lambda);
 end
 
-% Costruct constraints vectors
+%---- Costruct constraints vectors
 c = [c_path; c_bnd; c_comp];
 ceq = [ceq_dyn; ceq_path; ceq_bnd; ceq_comp];
 
