@@ -15,25 +15,15 @@ nGrid = OCP.options.nGrid;
 %% ----------------------------------------------------------
 %   FORMAT INITIAL GUESS
 % -----------------------------------------------------------
-%switch OCP.options.IGtype
-    %case 'linear'
-        % Interpolate the guess at the grid-points for transcription:
-        guess.tSpan = IG.time([1,end]);
-        guess.time = linspace(guess.tSpan(1), guess.tSpan(2), nGrid);
-        guess.state = interp1(IG.time', IG.state', guess.time')';
-        guess.control = interp1(IG.time', IG.control', guess.time')';
-        guess.lambda = interp1(IG.time',IG.lambda', guess.time')';        
-        % Mux intial guess
-        [q0, packSize] = mux(guess.time,guess.state,guess.control,guess.lambda);
+% Interpolate the guess at the grid-points for transcription:
+guess.tSpan = IG.time([1,end]);
+guess.time = linspace(guess.tSpan(1), guess.tSpan(2), nGrid);
+guess.state = interp1(IG.time', IG.state', guess.time')';
+guess.control = interp1(IG.time', IG.control', guess.time')';
+guess.lambda = interp1(IG.time',IG.lambda', guess.time')';        
 
-    %case 'custom'
-        % Mux intial guess
-        %guess = IG;
-        %[q0, packSize] = mux(IG.time,IG.state,IG.control,IG.lambda);
-    
-    %otherwise
-        %error('Invalid initial guess type)');
-%end
+% Mux intial guess
+[q0, packSize] = mux(guess.time,guess.state,guess.control,guess.lambda);
 
 %% ----------------------------------------------------------
 %   COST/OBJECTIVE FUNCTION
@@ -94,11 +84,9 @@ P.lb = lb;
 P.ub = ub;
 P.Aineq = []; P.bineq = [];
 P.Aeq = []; P.beq = [];
+P.solver = 'fmincon';
 
 P.options = optimoptions('fmincon','Display','iter','Algorithm','sqp','MaxIter',1e4,'MaxFunEval',1e6,'TolFun',1e-4);
-
-%P.options = OPT.fminOpt;
-P.solver = 'fmincon';
 
 [zSoln, objVal,exitFlag,output] = fmincon(P);
 

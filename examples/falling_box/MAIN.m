@@ -13,6 +13,7 @@ clc; clear; close all;
 
 % Add paths
 addpath(genpath('../../'));
+addpath('solutions');
 %% ----------------------------------------------------------
 %   MODEL PROPERTIES
 %   Intialize your dynamic model parameter values and dyanmics
@@ -43,24 +44,24 @@ OCP.bndCostFnc = @(t,x,u)fallingBox_costFnc(t,x,u,OCP.model.params);
 
 % Load initial guess
 data = load('fallingBox_data.mat');
-
+data2 = load('fallingBox_soln5.mat');
 
 % Time span
 % size: 1x65
 t0 = 0;
 tF = 2.5;
 %OCP.ig.time = [t0,tF];
-OCP.ig.time = data.Tsol';
+%OCP.ig.time = data.Tsol';
 
 % State 
 % x0, xF:   state vector [q;dq] => [2*n X 1] column vector
 %   [y; l; dy; dl];
 % size: 4x65
-OCP.ig.state = data.Xsol;
+%OCP.ig.state = data.Xsol;
 
 % Control
 % size: 1x65
-OCP.ig.control = zeros(1,65);
+%OCP.ig.control = zeros(1,65);
 
 % Contact forces
 % For a given contact point i, the contact force is
@@ -70,7 +71,8 @@ OCP.ig.control = zeros(1,65);
 % If there are m contact points then 
 %   lambda = [m x 2]
 % size: 2x65
-OCP.ig.lambda = [zeros(2,55), 50*ones(2,10)];
+%OCP.ig.lambda = [zeros(2,55), 50*ones(2,10)];
+OCP.ig = data2.soln.grid;
 
 
 % CONSTRAINTS & BOUNDARIES
@@ -173,7 +175,7 @@ guess = soln(end).guess;
 
 
 Notes = 'Revised complementary constraint calculation';
-save('fallingBox_soln5.mat','soln','OCP','Notes')
+save('solutions/fallingBox_soln6.mat','soln','OCP','Notes')
 %% ----------------------------------------------------------
 %   PLOT RESULTS
 % -----------------------------------------------------------

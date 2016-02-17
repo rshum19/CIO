@@ -40,11 +40,11 @@ Vcom= jacobian(Pcom,q)*dq;
 % Bottom of box surface velocity
 Vbtm = jacobian(Pcom,q)*dq;
 
-Phi = q(2) - h/2;
+Phi = [0;q(2) - h/2];
 
 J = jacobian(Phi,q);
 
-Phi = J*dq;
+Psi = J*dq;
 
 
 %% ---------------------------------------------------------

@@ -1,4 +1,4 @@
-function [dz, Phi, Psi] = fallingBox_dynamics(t,z,lambda,params)
+function [dz, Phi, Psi] = fallingBox_slantedDyn_wrap(t,z,lambda,params)
 
 
 %% ----------------------------------------------------------
@@ -14,8 +14,6 @@ h = p.h;
 % Gravity vector
 G = [0;-g];
 
-J = [0,1];
-
 if isempty(lambda)
     lambda = zeros(1,nt);
 end
@@ -28,16 +26,18 @@ Phi = zeros(nc,nt);
 
 for i = 1:nt
  
+    % Contact dynamic matrices Phi, Psi, J
+    [Phi(:,i),Psi(:,i),J(:,:,i)] = fallingBox_contactDyn_wrapper(x,p);
+
     % Box acceleration
-    ddx(:,i)  = G + J'*lambda(:,i)./p.m;
+    ddx(:,i)  = G + J(:,:,i)'*lambda(:,i)./p.m;
     
     % Phi function -- contact point equation
-    Phi(:,i) = x(2,i) - h/2;
+    %Phi(:,i) = x(2,i) - h/2;
  
     % Velocity of contact point
     %Psi(:,i) = J*dx(:,i); % Psi_y
-     Psi(:,i) = 0; % Psi_x
- 
+    %Psi(:,i) = 0; % Psi_x
 end
 
 dz = [dx;ddx];
