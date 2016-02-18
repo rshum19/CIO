@@ -85,7 +85,6 @@ P.ub = ub;
 P.Aineq = []; P.bineq = [];
 P.Aeq = []; P.beq = [];
 P.solver = 'fmincon';
-
 P.options = OPT.fminOpt;
 
 [zSoln, fVal,exitFlag,output] = fmincon(P);

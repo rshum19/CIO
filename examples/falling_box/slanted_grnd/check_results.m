@@ -14,7 +14,7 @@ clc; clear; close all;
 %% ----------------------------------------------------------
 %   LOAD RESULTS
 % -----------------------------------------------------------
-data = load('fallingBox_slanted_soln4.mat');
+data = load('fallingBox_slanted_soln1.mat');
 soln = data.soln;
 
 OCP.model.params = params_fallingBox_model;
@@ -35,30 +35,27 @@ fallingBox_plotResults2(t,x,lambda)
 % Kinematics
 [cntc_pts] = fallingBox_slantedKin_wrap(t,x,OCP.model.params);
 
+nCntcPts = size(lambda,1)/2;
 figure
-% X - position
-subplot(1,2,1)
-plot(t,cntc_pts(1,:))
-
-% subplot(3,2,3)
-% plot(t,cntc_pts(3,:))
-% ylabel('X-pos [m]');
-% 
-% subplot(3,2,5)
-% plot(t,cntc_pts(5,:))
-% xlabel('time [sec]')
-% Y-position
-subplot(1,2,2)
-plot(t,cntc_pts(2,:))
-
-% subplot(3,2,4)
-% plot(t,cntc_pts(4,:))
-% ylabel('Y-pos [m]');
-% 
-% subplot(3,2,6)
-% plot(t,cntc_pts(6,:))
-% xlabel('time [sec]')
-
+idx = 1:2:2*nCntcPts;
+for i = 1:nCntcPts
+    % X - position
+    subplot(nCntcPts,2,idx(i))
+    plot(t,cntc_pts(idx(i),:))
+    xlabel('Time [sec]')
+    ylabel('Pos [m]')
+    if i == 1
+        title('X-postion co-ordinate')
+    end
+    % Y - position
+    subplot(nCntcPts,2,idx(i)+1)
+    plot(t,cntc_pts(idx(i)+1,:))
+    xlabel('Time [sec]')
+    ylabel('Pos [m]')
+    if i == 1
+        title('Y-postion co-ordinate')
+    end
+end
 
 % Forward dynamics
 [f, Phi, Psi] = OCP.model.dynamics(t,x,u,lambda(2,:));
@@ -82,12 +79,14 @@ figure
 plot(t,ceq_lambda,'*-')
 xlabel('Time [sec]')
 ylabel('\Phi \lambda ');
+title('Lambda equality constraint')
 
 % S.T. No-slip condition
 figure
 plot(t,ceq_slip,'*-')
 xlabel('Time [sec]')
-ylabel('\Phi \lambda ');
+ylabel('\Psi \lambda ');
+title('Slip equality constraint')
 
 figure
 plot(1:length(c_comp),c_comp,'o-',1:length(ceq_comp),ceq_comp,'*-')

@@ -135,21 +135,21 @@ OCP.bounds.slacks.ub = inf(2,1);
 method = 'euler_mod';
 % method = 'trapezoidal';
 % method = 'hermiteSimpson';
-fminOpt = optimoptions('fmincon','Display','iter','Algorithm','sqp','MaxIter',1e4,'MaxFunEval',1e6,'TolFun',1e-6,'TolX',1e-20);
+fminOpt = optimoptions('fmincon','Display','iter','Algorithm','sqp','MaxIter',1e4,'MaxFunEvals',1e6,'TolFun',1e-6);
 %--- Interation 1
 options(1).method = 'euler_mod';
-options(1).nGrid = 15;
-options(1).fminOpt.MaxFunEval = 1e4;
+options(1).nGrid = 20;
+options(1).fminOpt = fminOpt;
 
 %--- Interation 2
-options(2).method = 'euler_mod';
-options(2).nGrid = 25;
-options(2).fminOpt = fminOpt;
+% options(2).method = 'euler_mod';
+% options(2).nGrid = 25;
+% options(2).fminOpt = fminOpt;
 
 %--- Interation 3
-options(3).method = 'euler_mod';
-options(3).nGrid = 50;
-options(3).fminOpt = fminOpt;
+%options(3).method = 'euler_mod';
+%options(3).nGrid = 50;
+%options(3).fminOpt = fminOpt;
 
 % For a full list of options refer to :
 %   http://www.mathworks.com/help/optim/ug/fmincon.html#inputarg_options
@@ -162,19 +162,20 @@ displayIGnBnds(OCP.ig,OCP.bounds,options(1).nGrid);
 % -----------------------------------------------------------
 
 for iter = 1:size(options,2)
+    fprintf('--------- Optimization Pass No.: %d ---------',iter)
     % Set options to pass to solver
     OCP.options = options(iter);
     
     % Solve Optimal control problem
     tic;
-    soln(iter) = OptCtrlSolver(OCP);
+    soln = OptCtrlSolver(OCP);
     time = toc;
     
     % save time of optimization
     soln.time = time;
     
     % Update initial condition
-    OCP.ig = soln(iter).grid;
+    OCP.ig = soln.grid;
 end
 
 t = soln(end).grid.time;
@@ -184,7 +185,7 @@ lambda = soln(end).grid.lambda;
 guess = soln(end).guess;
 
 Notes = 'With augmented Phi function to include theta';
-save('solutions/fallingBox_slanted_soln5.mat','soln','OCP','Notes')
+save('solutions/fallingBox_slanted_soln7.mat','soln','OCP','Notes')
 %% ----------------------------------------------------------
 %   PLOT RESULTS
 % -----------------------------------------------------------
