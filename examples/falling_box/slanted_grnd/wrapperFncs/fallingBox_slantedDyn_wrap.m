@@ -14,7 +14,7 @@ g = p.g;
 M = diag([p.m,p.m,p.I]);
 
 % Gravity vector
-G = [0;-g;0];  
+G = [0;p.m*g;0];  
 
 if isempty(lambda)
     lambda = zeros(1,nt);
@@ -33,7 +33,7 @@ for i = 1:nt
     [Phi(:,i),Psi(:,i),J] = fallingBox_contactDyn_wrapper(z(:,i),p);
 
     % Box acceleration
-    ddx(:,i)  = inv(M)*(G + J'*lambda(:,i));
+    ddx(:,i)  = M\(-G + J'*lambda(:,i));
     
 end
 

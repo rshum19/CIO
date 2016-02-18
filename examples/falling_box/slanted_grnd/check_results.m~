@@ -14,7 +14,7 @@ clc; clear; close all;
 %% ----------------------------------------------------------
 %   LOAD RESULTS
 % -----------------------------------------------------------
-data = load('fallingBox_slanted_soln1.mat');
+data = load('fallingBox_slanted_soln4.mat');
 soln = data.soln;
 
 OCP.model.params = params_fallingBox_model;
@@ -30,20 +30,53 @@ x = soln.grid.state;
 u = soln.grid.control;
 lambda = soln.grid.lambda;
 
+fallingBox_plotResults2(t,x,lambda)
+
+% Kinematics
+[cntc_pts] = fallingBox_slantedKin_wrap(t,x,OCP.model.params);
+
+figure
+% X - position
+subplot(1,2,1)
+plot(t,cntc_pts(1,:))
+
+% subplot(3,2,3)
+% plot(t,cntc_pts(3,:))
+% ylabel('X-pos [m]');
+% 
+% subplot(3,2,5)
+% plot(t,cntc_pts(5,:))
+% xlabel('time [sec]')
+% Y-position
+subplot(1,2,2)
+plot(t,cntc_pts(2,:))
+
+% subplot(3,2,4)
+% plot(t,cntc_pts(4,:))
+% ylabel('Y-pos [m]');
+% 
+% subplot(3,2,6)
+% plot(t,cntc_pts(6,:))
+% xlabel('time [sec]')
+
+
 % Forward dynamics
-[f, Phi, Gamma] = OCP.model.dynamics(t,x,u,lambda(2,:));
+[f, Phi, Psi] = OCP.model.dynamics(t,x,u,lambda(2,:));
 figure
 plot(t,Phi,'*-')
 xlabel('Time [sec]')
 ylabel('Phi function value');
 
 % Complementary constraints 
-[c_comp, ceq_comp] = OCP.compCst(Phi,Gamma,t,x,u,lambda);
+[c_comp, ceq_comp] = OCP.compCst(Phi,Psi,t,x,u,lambda);
 
-ceq_lambda = Phi.*lambda(2,:);
-%ceq_lambda = reshape(ceq_lambda,numel(ceq_lambda),1);
-ceq_lambda2 = Phi*lambda(2,:)';
-ceq_lambda2 = reshape(ceq_lambda2,numel(ceq_lambda2),1);
+nt = length(t);
+ceq_lambda = zeros(nt,1);
+ceq_slip = zeros(nt,1);
+for i = 1:nt
+    ceq_lambda(i) = Phi(:,i)'*lambda(2,i);
+    ceq_slip(i) = Psi(:,i)'*lambda(1,i);
+end
 
 figure
 plot(t,ceq_lambda,'*-')
@@ -51,8 +84,6 @@ xlabel('Time [sec]')
 ylabel('\Phi \lambda ');
 
 % S.T. No-slip condition
-ceq_slip = Gamma.*lambda(1,:);
-ceq_slip = reshape(ceq_slip,numel(ceq_slip),1);
 figure
 plot(t,ceq_slip,'*-')
 xlabel('Time [sec]')

@@ -3,7 +3,6 @@
 % -----------------------------------------------------------
 clc; clear; close all;
 
-addpath('helperFncs');
 %% ----------------------------------------------------------
 %   MODEL VARIABLES
 % -----------------------------------------------------------
@@ -26,11 +25,12 @@ syms h real
 
 % Ground line 
 syms a real
+syms b real
 syms c real
 
 q = [x; y; th];
 dq = [dx; dy; dth];
-line = [a,c];
+line = [a,b,c];
 
 %% ----------------------------------------------------------
 %   DEFINE SYSTEM KINEMATICS
@@ -44,7 +44,7 @@ Pcom = [x; y];
 
 % Cotnact points
 Pc1 = Pcom + h/2*[-sin(th);-cos(th)] + w/2*[-cos(th);sin(th)];
-Pc2 = Pcom - h/2*[sin(th);cos(th)];
+Pc2 = Pcom + h/2*[-sin(th);-cos(th)];
 Pc3 = Pcom + h/2*[sin(th);cos(th)] + w/2*[cos(th);-sin(th)];
 
 % CoM velcoity
@@ -54,23 +54,25 @@ Vcom= jacobian(Pcom,q)*dq;
 Vbtm = jacobian(Pcom,q)*dq;
 
 % Contact penetration distance
-phi1 = pt2line_dist(Pc1,line);
-phi2 = pt2line_dist(Pc2,line);
-phi3 = pt2line_dist(Pc3,line);
-phi1s = y - h/2;
-phi2s = y - h/2;
-phi3s = y - h/2;
+%phi1 = pt2line_dist(Pc1,line);
+%phi2 = pt2line_dist(Pc2,line);
+%phi3 = pt2line_dist(Pc3,line);
+phi1 = y - h/2;
+phi2 = y - h/2;
+phi3 = y - h/2;
 
-%Phi = [phi1;phi2;phi3];
-Phi = phi2;
+Phi = [phi1;phi2;phi3];
 
+% Jacobian 
 J = jacobian(Phi,q);
 
+% Tangential Velocity
 Psi = J*dq;
 
-%% ---------------------------------------------------------
+%% ----------------------------------------------------------
 %   DERIVE SYSTEM DYNAMICS
-% ----------------------------------------------------------
+% -----------------------------------------------------------
+
 % KINETIC ENERGY KE_i = 0.5*m_i*Vc_i^2 + 0.5*I_i dq_i^2
 KE = 0.5*m*Vcom.'*Vcom + 0.5*I*dth^2;
 KE = simplify(KE);
@@ -111,44 +113,33 @@ B_mtx = B_mtx';
 %% ----------------------------------------------------------
 %   GENERATE MATLAB FUNCTIONS
 % -----------------------------------------------------------
-% Create folder to save autogerated functions
-autoFolderName = 'autogenFncs';
-if ~exist(autoFolderName,'dir')
-  mkdir(autoFolderName);
-end
-
 % Generate Dynamics
 % -----------------
 params_list = {'w','h',...
                'm','I',...
                'g'};
-           
+
 q_list = {'x','y','th'};
 dq_list = {'dx','dy','dth'};
 u_list = {'u1'};
-line_coeff = {'a','c'};
+line_coeff = {'a','b','c'};
 
-matlabFunction(D_mtx,C_mtx, G_vec, B_mtx,'File',fullfile(autoFolderName,'autogen_fallingBox_EOM_mtxs.m'),...
+
+matlabFunction(D_mtx,C_mtx, G_vec, B_mtx,'File','fallingBox_EOM_mtxs.m',...
    'vars',horzcat(q_list,dq_list,params_list));
 
 % Generate Energy
 % ----------------
-matlabFunction(KE,PE, 'File', fullfile(autoFolderName,'autogen_fallingBox_Energy.m'),...
+matlabFunction(KE,PE, 'File', 'fallingBox_Energy.m',...
                'vars', horzcat(q_list,dq_list,params_list),...
                'outputs',{'U','T'});
 
 % Generate Kinematics
 % --------------------
-matlabFunction(Pc1,Pc2,Pc3,'File',fullfile(autoFolderName,'autogen_contact_pts.m'),...
-                'vars',horzcat(q_list,params_list),...
-                'outputs',{'pc1','pc2','pc3'});
-           
-matlabFunction(Phi,Psi,J,'File',fullfile(autoFolderName,'autogen_contactDyn.m'),...
-                'vars',horzcat(q_list,dq_list,params_list,line_coeff),...
-                'outputs',{'Phi','Psi','J'});
+params_list = {'l1','l2'};
 
-
-
-
-
+matlabFunction(P1,P2,V1,V2,'File','fallingBox_kin.m',...
+                'vars',horzcat(q_list,dq_list,params_list),...
+                'outputs',{'p1','p2','dp1','dp2'});
+            
 

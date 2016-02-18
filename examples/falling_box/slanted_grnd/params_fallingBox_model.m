@@ -26,6 +26,6 @@ params.m = m;
 params.I = m/12*(h^2 + w^2);
 
 %---- Other
-params.line = [0;0;0];
+params.line = [0;0];
 end
 

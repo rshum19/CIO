@@ -6,14 +6,13 @@ function [ dist ] = pt2line_dist(p,l)
 
 x = p(1);
 y = p(2);
-a = l(1);
-b = l(2);
-c = l(3);
+m = l(1);
+c = l(2);
 
 if all(l == 0)
     dist = y;
 else
-    dist = abs(a*x + b*y + c)/sqrt(a^2 + b^2);
+    dist = abs(m*x + y + c)/sqrt(m^2 + 1);
 end
 
 end

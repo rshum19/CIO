@@ -1,4 +1,4 @@
-function [ Pc1,Pc2,Pc3 ] = fallingBox_contact_pts(t,z,params)
+function [ Pc1,Pc2,Pc3 ] = fallingBox_contactPts_wrap(t,z,params)
 
 nt = length(t);
 p = params;
