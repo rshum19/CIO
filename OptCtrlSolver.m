@@ -86,7 +86,7 @@ P.Aineq = []; P.bineq = [];
 P.Aeq = []; P.beq = [];
 P.solver = 'fmincon';
 
-P.options = optimoptions('fmincon','Display','iter','Algorithm','sqp','MaxIter',1e4,'MaxFunEval',1e6,'TolFun',1e-6,'TolX',1e-10);
+P.options = OPT.fminOpt;
 
 [zSoln, fVal,exitFlag,output] = fmincon(P);
 

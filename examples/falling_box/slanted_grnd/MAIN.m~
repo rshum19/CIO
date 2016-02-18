@@ -60,7 +60,7 @@ OCP.ig.state = [ zeros(1,size(data.state,2));...
 %OCP.ig.state = data.state;
 
 % Control input
-OCP.ig.control = data.control;
+OCP.ig.control = zeros(1,size(data.state,2));
 
 % Contact forces
 % For a given contact point i, the contact force is
@@ -78,7 +78,7 @@ OCP.ig.lambda = [lambdaX;lambdaY];
 %OCP.ig.lambda = data.lambda;
 
 % Slack varaibles
-OCP.ig.slacks.gamma = 
+OCP.ig.slacks = zeros(1,size(data.state,2));
 
 % CONSTRAINTS & BOUNDARIES
 % ------------------------
@@ -115,8 +115,8 @@ OCP.bounds.finalState.ub = [10; 50; 2*pi; inf(3,1)];
 %%TODO
 % Change so they are set from model parametes
 maxTau = 500;
-OCP.bounds.control.lb = 0; 
-OCP.bounds.control.ub = 0;
+OCP.bounds.control.lb = -inf(1,1); 
+OCP.bounds.control.ub = inf(1,1);
 
 % Contact forces:
 OCP.bounds.lambda.lb = -inf(2,1);
@@ -135,20 +135,23 @@ OCP.bounds.slacks.ub = inf(2,1);
 method = 'euler_mod';
 % method = 'trapezoidal';
 % method = 'hermiteSimpson';
-
+fminOpt = optimoptions('fmincon','Display','iter','Algorithm','sqp','MaxIter',1e4,'MaxFunEval',1e6,'TolFun',1e-6,'TolX',1e-20)
 %--- Interation 1
 options(1).method = 'euler_mod';
-options(1).nGrid = 20;
-
+options(1).nGrid = 15;
+options(1).fminOpt = 
 %--- Interation 2
-%options(2).method = 'euler_mod';
-%options(2).nGrid = 65;
+options(2).method = 'euler_mod';
+options(2).nGrid = 25;
 
+%--- Interation 3
+options(3).method = 'euler_mod';
+options(3).nGrid = 50;
 
 % For a full list of options refer to :
 %   http://www.mathworks.com/help/optim/ug/fmincon.html#inputarg_options
 %%% TODO setting options here is not working need to see why
-OCP.options.fminOpt.MaxFunEval = 1e5;
+P.options = optimoptions('fmincon','Display','iter','Algorithm','sqp','MaxIter',1e4,'MaxFunEval',1e6,'TolFun',1e-6,'TolX',1e-20);
 
 % Display initial guess
 displayIGnBnds(OCP.ig,OCP.bounds,options(1).nGrid);
@@ -179,7 +182,7 @@ lambda = soln(end).grid.lambda;
 guess = soln(end).guess;
 
 Notes = 'With augmented Phi function to include theta';
-save('solutions/fallingBox_slanted_soln4.mat','soln','OCP','Notes')
+save('solutions/fallingBox_slanted_soln5.mat','soln','OCP','Notes')
 %% ----------------------------------------------------------
 %   PLOT RESULTS
 % -----------------------------------------------------------

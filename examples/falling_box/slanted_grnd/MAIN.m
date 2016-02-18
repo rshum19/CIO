@@ -135,20 +135,25 @@ OCP.bounds.slacks.ub = inf(2,1);
 method = 'euler_mod';
 % method = 'trapezoidal';
 % method = 'hermiteSimpson';
-
+fminOpt = optimoptions('fmincon','Display','iter','Algorithm','sqp','MaxIter',1e4,'MaxFunEval',1e6,'TolFun',1e-6,'TolX',1e-20);
 %--- Interation 1
 options(1).method = 'euler_mod';
-options(1).nGrid = 20;
+options(1).nGrid = 15;
+options(1).fminOpt.MaxFunEval = 1e4;
 
 %--- Interation 2
-%options(2).method = 'euler_mod';
-%options(2).nGrid = 65;
+options(2).method = 'euler_mod';
+options(2).nGrid = 25;
+options(2).fminOpt = fminOpt;
 
+%--- Interation 3
+options(3).method = 'euler_mod';
+options(3).nGrid = 50;
+options(3).fminOpt = fminOpt;
 
 % For a full list of options refer to :
 %   http://www.mathworks.com/help/optim/ug/fmincon.html#inputarg_options
 %%% TODO setting options here is not working need to see why
-OCP.options.fminOpt.MaxFunEval = 1e5;
 
 % Display initial guess
 displayIGnBnds(OCP.ig,OCP.bounds,options(1).nGrid);
@@ -179,7 +184,7 @@ lambda = soln(end).grid.lambda;
 guess = soln(end).guess;
 
 Notes = 'With augmented Phi function to include theta';
-save('solutions/fallingBox_slanted_soln4.mat','soln','OCP','Notes')
+save('solutions/fallingBox_slanted_soln5.mat','soln','OCP','Notes')
 %% ----------------------------------------------------------
 %   PLOT RESULTS
 % -----------------------------------------------------------
