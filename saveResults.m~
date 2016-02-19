@@ -21,7 +21,7 @@ while ~savedResults
     else
         % File does not exist.
         if overWrite
-           fullFileName = fullfile(FolderName,strcat(fileName,num2str(idxFile-1),'.mat'));
+           fullFileName = fullfile(FolderName,fileName,num2str(idxFile-1),'.mat');
         end
         save(fullFileName,varNames{:})
         fprintf('File "%s" was succesfully saved!\n',fullFileName);

@@ -133,9 +133,9 @@ options(1).nGrid = 20;
 options(1).fminOpt = fminOpt;
 
 %--- Interation 2
-% options(2).method = 'euler_mod';
-% options(2).nGrid = 65;
-% options(2).fminOpt = fminOpt;
+options(2).method = 'euler_mod';
+options(2).nGrid = 65;
+options(2).fminOpt = fminOpt;
 
 % Display initial guess
 %displayIGnBnds(OCP.ig,OCP.bounds,OCP.options(1).nGrid);
@@ -165,9 +165,9 @@ lambda = soln(end).grid.lambda;
 guess = soln(end).guess;
 
 % Save results
-fileName = 'fallingBox_soln_test';
+fileName = 'fallingBox_soln';
 overWrite = 0;
-Notes = 'none';
+Notes = 'Working solution';
 saveResults(solnFolderName, fileName, overWrite, soln,OCP,Notes)
 %% ----------------------------------------------------------
 %   PLOT RESULTS

@@ -17,7 +17,7 @@ addpath('solutions');
 %% ----------------------------------------------------------
 %   LOAD RESULTS
 % -----------------------------------------------------------
-data = load('fallingBox_soln6.mat');
+data = load('fallingBox_soln7.mat');
 soln = data.soln;
 
 OCP.model.params = params_fallingBox_model;
@@ -79,6 +79,7 @@ for i = 1:nt
     ceq_slip(i) = Psi(:,i)'*lambda(1,i);
 end
 
+% S.T. positive normal forces
 figure
 plot(t,ceq_lambda,'*-')
 xlabel('Time [sec]')
@@ -92,9 +93,16 @@ xlabel('Time [sec]')
 ylabel('\Psi \lambda ');
 title('Slip equality constraint')
 
+% S.T. Nonlinear Constraints
 figure
-plot(1:length(c_comp),c_comp,'o-',1:length(ceq_comp),ceq_comp,'*-')
+subplot(2,1,1)
+plot(1:length(ceq_comp),ceq_comp,'*-')
 xlabel('Index')
 ylabel('Constraint value')
-legend('inequalities','equalities')
-title('Complementary Constraints')
+title('Complementary equalities Constraints, ceq(x) = 0')
+
+subplot(2,1,2)
+plot(1:length(c_comp),c_comp,'o-')
+xlabel('Index')
+ylabel('Constraint value')
+title('Complementary inequality Constraints, c(x) \leq 0')

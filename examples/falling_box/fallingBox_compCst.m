@@ -19,7 +19,7 @@ c_lambda = -lambdaYvec;
 
 % S.T. Static friction limit
 lambdaXvec = reshape(lambdaX,numel(lambdaX),1);
-c_fric = (mu*lambdaYvec).^2 - lambdaXvec.^2;
+c_fric = -((mu*lambdaYvec).^2 - lambdaXvec.^2);
 
 %% EQUALITY CONSTRAINTS
 % S.T. force nonzero if and only if contact is active

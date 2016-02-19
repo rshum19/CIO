@@ -12,17 +12,17 @@
 clc; clear; close all;
 
 % Define folder names
-subFolderName = 'slanted_grnd';
-solnFolderName = fullfile(subFolderName,'solutions');
+subFolderName = 'slanted_grnd')
+solnFolderName = 'slanted_grnd/solutions';
 
 % Add paths
 addpath('../../');
 addpath('../../methods');
 addpath(solnFolderName );
-addpath(subFolderName);
-addpath(fullfile(subFolderName,'autogenFncs'));
-addpath(fullfile(subFolderName,'wrapperFncs'));
-addpath(fullfile(subFolderName,'helperFncs'));
+addpath('slanted_grnd)
+addpath('slanted_grnd/autogenFncs');
+addpath('slanted_grnd/wrapperFncs');
+addpath('slanted_grnd/helperFncs');
 %% ----------------------------------------------------------
 %   MODEL PROPERTIES
 %   Intialize your dynamic model parameter values and dyanmics
@@ -77,9 +77,9 @@ OCP.ig.control = data.control;
 % If there are m contact points then 
 %   lambda = [2m x nt]
 
-lambdaX = [data.lambda(1,:);data.lambda(1,:);data.lambda(1,:)];
+lambdaX = data.lambda(1,:);
 
-lambdaY = [data.lambda(2,:);data.lambda(2,:);data.lambda(2,:)];
+lambdaY = data.lambda(2,:);
 
 OCP.ig.lambda = [lambdaX;lambdaY];
 %OCP.ig.lambda = data.lambda;
@@ -123,8 +123,12 @@ OCP.bounds.control.lb = -inf(1,1);
 OCP.bounds.control.ub = inf(1,1);
 
 % Contact forces:
-OCP.bounds.lambda.lb = -inf(6,1);
-OCP.bounds.lambda.ub = inf(6,1);
+OCP.bounds.lambda.lb = -inf(2,1);
+OCP.bounds.lambda.ub = inf(2,1);
+
+% Slack variable gamma:
+OCP.bounds.slacks.lb = -inf(2,1);
+OCP.bounds.slacks.ub = inf(2,1);
 
 %% ----------------------------------------------------------
 %   SOLVER OPTIONS
@@ -145,14 +149,13 @@ fminOpt = optimoptions('fmincon','Display','iter','Algorithm','interior-point','
 options(1).method = 'euler_mod';
 options(1).nGrid = 20;
 options(1).fminOpt = fminOpt;
-options(1).fminOpt.TolCon = 1e-3;
 
 % %--- Interation 2
-options(2).method = 'euler_mod';
-options(2).nGrid = 50;
-options(2).fminOpt = fminOpt;
-options(2).fminOpt.MaxFunEvals = 5e4;
-
+% options(2).method = 'euler_mod';
+% options(2).nGrid = 50;
+% fminOpt.MaxFunEvals = 5e4;
+% options(2).fminOpt = fminOpt;
+% 
 % %--- Interation 3
 % options(3).method = 'euler_mod';
 % options(3).nGrid = 100;
@@ -160,7 +163,7 @@ options(2).fminOpt.MaxFunEvals = 5e4;
 % options(3).fminOpt = fminOpt;
 
 % Display initial guess
-%displayIGnBnds(OCP.ig,OCP.bounds,options(1).nGrid);
+displayIGnBnds(OCP.ig,OCP.bounds,options(1).nGrid);
 %% ----------------------------------------------------------
 %   SOLVE NLP PROBLEM
 % -----------------------------------------------------------
@@ -191,7 +194,7 @@ guess = soln(end).guess;
 % Save results
 fileName = 'fallingBox_slanted_soln';
 overWrite = 0;
-Notes = 'Phi(x,y) not Phi(x,y,theta), 3 contact point';
+Notes = 'Phi(x,y) not Phi(x,y,theta), 1 contact point';
 saveResults(solnFolderName, fileName, overWrite, soln,OCP,Notes)
 %% ----------------------------------------------------------
 %   PLOT RESULTS
