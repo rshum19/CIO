@@ -35,11 +35,5 @@ end
 c_comp = [c_nopen;c_lambda;c_fric];
 ceq_comp = [ceq_lambda; ceq_slip];
 
-% figure(100)
-% subplot(2,1,1)
-% plot(c_comp)
-% subplot(2,1,2)
-% plot(ceq_comp)
-%drawnow;
 end
 

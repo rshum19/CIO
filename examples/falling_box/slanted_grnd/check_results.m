@@ -11,14 +11,21 @@
 % Clear workspace
 clc; clear; close all;
 
+% Add paths
+addpath(genpath('../../..'));
+addpath('solutions');
+addpath('autogenFncs');
+addpath('wrapperFncs');
+addpath('helperFncs');
+
 %% ----------------------------------------------------------
 %   LOAD RESULTS
 % -----------------------------------------------------------
-data = load('fallingBox_slanted_soln1.mat');
+data = load('fallingBox_soln6.mat');
 soln = data.soln;
 
 OCP.model.params = params_fallingBox_model;
-OCP.model.dynamics = @(t,x,u,lambda)fallingBox_dynamics(t,x,lambda,OCP.model.params);
+OCP.model.dynamics = @(t,x,u,lambda)fallingBox_slantedDyn_wrap(t,x,lambda,OCP.model.params);
 OCP.compCst = @(Phi,Gamma,t,x,u,lambda)fallingBox_compCst(Phi,Gamma,t,x,u,lambda,OCP.model.params);
 
 %% ----------------------------------------------------------
@@ -62,7 +69,8 @@ end
 figure
 plot(t,Phi,'*-')
 xlabel('Time [sec]')
-ylabel('Phi function value');
+ylabel('\Phi(q) [m]');
+title('\Phi(q) function value')
 
 % Complementary constraints 
 [c_comp, ceq_comp] = OCP.compCst(Phi,Psi,t,x,u,lambda);
@@ -78,8 +86,8 @@ end
 figure
 plot(t,ceq_lambda,'*-')
 xlabel('Time [sec]')
-ylabel('\Phi \lambda ');
-title('Lambda equality constraint')
+ylabel('\Phi(q)\lambda_y');
+title('\Phi(q)\lambda_y = 0, Lambda equality constraint')
 
 % S.T. No-slip condition
 figure

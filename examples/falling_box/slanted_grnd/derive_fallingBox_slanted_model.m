@@ -62,7 +62,7 @@ phi2s = y - h/2;
 phi3s = y - h/2;
 
 %Phi = [phi1;phi2;phi3];
-Phi = Pc2(2);
+Phi = phi1s;
 
 J = jacobian(Phi,q);
 

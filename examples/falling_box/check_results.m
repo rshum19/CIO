@@ -11,10 +11,13 @@
 % Clear workspace
 clc; clear; close all;
 
+% Add paths
+addpath('solutions');
+
 %% ----------------------------------------------------------
 %   LOAD RESULTS
 % -----------------------------------------------------------
-data = load('fallingBox_soln2.mat');
+data = load('fallingBox_soln6.mat');
 soln = data.soln;
 
 OCP.model.params = params_fallingBox_model;
@@ -30,33 +33,64 @@ x = soln.grid.state;
 u = soln.grid.control;
 lambda = soln.grid.lambda;
 
+fallingBox_plotResults(t,x,lambda)
+
+% Kinematics
+% [cntc_pts] = fallingBox_slantedKin_wrap(t,x,OCP.model.params);
+% 
+% nCntcPts = size(lambda,1)/2;
+% figure
+% idx = 1:2:2*nCntcPts;
+% for i = 1:nCntcPts
+%     % X - position
+%     subplot(nCntcPts,2,idx(i))
+%     plot(t,cntc_pts(idx(i),:))
+%     xlabel('Time [sec]')
+%     ylabel('Pos [m]')
+%     if i == 1
+%         title('X-postion co-ordinate')
+%     end
+%     % Y - position
+%     subplot(nCntcPts,2,idx(i)+1)
+%     plot(t,cntc_pts(idx(i)+1,:))
+%     xlabel('Time [sec]')
+%     ylabel('Pos [m]')
+%     if i == 1
+%         title('Y-postion co-ordinate')
+%     end
+% end
+
 % Forward dynamics
-[f, Phi, Gamma] = OCP.model.dynamics(t,x,u,lambda(2,:));
+[f, Phi, Psi] = OCP.model.dynamics(t,x,u,lambda(2,:));
 figure
 plot(t,Phi,'*-')
 xlabel('Time [sec]')
-ylabel('Phi function value');
+ylabel('\Phi(q) [m]');
+title('\Phi(q) function value')
 
 % Complementary constraints 
-[c_comp, ceq_comp] = OCP.compCst(Phi,Gamma,t,x,u,lambda);
+[c_comp, ceq_comp] = OCP.compCst(Phi,Psi,t,x,u,lambda);
 
-ceq_lambda = Phi.*lambda(2,:);
-ceq_lambda = reshape(ceq_lambda,numel(ceq_lambda),1);
-ceq_lambda2 = Phi*lambda(2,:)';
-ceq_lambda2 = reshape(ceq_lambda2,numel(ceq_lambda2),1);
+nt = length(t);
+ceq_lambda = zeros(nt,1);
+ceq_slip = zeros(nt,1);
+for i = 1:nt
+    ceq_lambda(i) = Phi(:,i)'*lambda(2,i);
+    ceq_slip(i) = Psi(:,i)'*lambda(1,i);
+end
 
 figure
 plot(t,ceq_lambda,'*-')
 xlabel('Time [sec]')
-ylabel('\Phi \lambda ');
+ylabel('\Phi(q)\lambda_y');
+title('\Phi(q)\lambda_y = 0, Lambda equality constraint')
 
 % S.T. No-slip condition
-ceq_slip = Gamma.*lambda(1,:);
-ceq_slip = reshape(ceq_slip,numel(ceq_slip),1);
 figure
 plot(t,ceq_slip,'*-')
 xlabel('Time [sec]')
-ylabel('\Phi \lambda ');
+ylabel('\Psi \lambda ');
+title('Slip equality constraint')
 
 figure
 plot(1:length(c_comp),c_comp,'o-',1:length(ceq_comp),ceq_comp,'*-')

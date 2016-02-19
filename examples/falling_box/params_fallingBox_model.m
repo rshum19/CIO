@@ -11,8 +11,8 @@ params.mu = mu;
 params.g = g;
 
 %---- GEOMETRY
-w = 0.2;       %[m]
-h = 0.2;
+w = 4;       %[m]
+h = 4;
 
 % Link length
 params.w = w;
@@ -23,11 +23,9 @@ m = 5;         % [kg]
 params.m = m;
 
 %---- MOMENT OF INERTIA
-%params.I1 = 0.5*m0*l0^2;
-%params.I2 = 0.002*m0*l0^2;
-%params.I3 = 0.002*m0*l0^2;
+params.I = m/12*(h^2 + w^2);
 
 %---- Other
-
+params.line = [0;0];
 end
 

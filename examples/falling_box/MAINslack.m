@@ -70,11 +70,12 @@ OCP.ig.control = zeros(1,size(data.state,2));
 % If there are m contact points then 
 %   lambda = [2m x nt]
 
-lambdaX = data.lambda(1,:);
+lambdaXp = zeros(1,size(data.state,2));
+lambdaXn = zeros(1,size(data.state,2));
 
 lambdaY = data.lambda(4,:);
 
-OCP.ig.lambda = [lambdaX;lambdaY];
+OCP.ig.lambda = [lambdaXp;lambdaXn;lambdaY];
 %OCP.ig.lambda = data.lambda;
 
 % Slack varaibles
@@ -93,7 +94,7 @@ OCP.ig.slacks = zeros(1,size(data.state,2));
 %   OCP.compCst = @(t0,x0,u0,tF,xF,uF)compCst(z);
 OCP.pathCst = [];
 OCP.bndCst = [];
-OCP.compCst = @(Phi,Gamma,t,x,u,lambda)fallingBox_compCst(Phi,Gamma,t,x,u,lambda,OCP.model.params);
+OCP.compCst = @(Phi,Gamma,t,x,u,lambda,slacks)fallingBox_compCst_wSlacks(Phi,Gamma,t,x,u,lambda,slacks,OCP.model.params);
 
 
 %----- Linear constraints
@@ -119,12 +120,12 @@ OCP.bounds.control.lb = -inf(1,1);
 OCP.bounds.control.ub = inf(1,1);
 
 % Contact forces:
-OCP.bounds.lambda.lb = -inf(2,1);
-OCP.bounds.lambda.ub = inf(2,1);
+OCP.bounds.lambda.lb = -inf(3,1);
+OCP.bounds.lambda.ub = inf(3,1);
 
 % Slack variable gamma:
-OCP.bounds.slacks.lb = -inf(2,1);
-OCP.bounds.slacks.ub = inf(2,1);
+OCP.bounds.slacks.lb = -inf(1,1);
+OCP.bounds.slacks.ub = inf(1,1);
 
 %% ----------------------------------------------------------
 %   SOLVER OPTIONS
@@ -168,7 +169,7 @@ for iter = 1:size(options,2)
     
     % Solve Optimal control problem
     tic;
-    soln = OptCtrlSolver(OCP);
+    soln = OptCtrlSolver_wSlacks(OCP);
     time = toc;
     
     % save time of optimization
