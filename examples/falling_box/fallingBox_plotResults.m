@@ -34,7 +34,7 @@ for i = 1:nLambda
     
     % Lamnda_x forces 
     subplot(nLambda,2,idx(i))
-    plot(t,lambda(idx(i),:))
+    plot(t,lambda(i,:))
     title('\lambda_{x}')
     xlabel('time [sec]');
     ylabel('Force [N]')
@@ -44,7 +44,7 @@ for i = 1:nLambda
     
     % Lamnda_y forces
     subplot(nLambda,2,idx(i)+1)
-    plot(t,lambda(idx(i)+1,:))
+    plot(t,lambda(i+nLambda,:))
     xlabel('time [sec]');
     ylabel('Force [N]')
     if i == 1

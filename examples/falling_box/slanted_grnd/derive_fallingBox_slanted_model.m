@@ -61,8 +61,8 @@ phi1s = y - h/2;
 phi2s = y - h/2;
 phi3s = y - h/2;
 
-%Phi = [phi1;phi2;phi3];
-Phi = [phi1s; phi2s; phi3s];
+Phi = phi1;
+%Phi = [phi1s; phi2s; phi3s];
 
 J = jacobian(Phi,q);
 

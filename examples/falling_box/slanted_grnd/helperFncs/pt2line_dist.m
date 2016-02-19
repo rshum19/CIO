@@ -12,7 +12,11 @@ c = l(2);
 if all(l == 0)
     dist = y;
 else
-    dist = abs(m*x + y + c)/sqrt(m^2 + 1);
+    % Absolute distance
+    %dist = abs(m*x + y + c)/sqrt(m^2 + 1);
+    
+    % Signed distance
+    dist = m*x + y + c/sqrt(m^2 + 1);
 end
 
 end

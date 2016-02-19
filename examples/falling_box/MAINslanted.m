@@ -77,9 +77,11 @@ OCP.ig.control = data.control;
 % If there are m contact points then 
 %   lambda = [2m x nt]
 
-lambdaX = [data.lambda(1,:);data.lambda(1,:);data.lambda(1,:)];
+%lambdaX = [data.lambda(1,:);data.lambda(1,:);data.lambda(1,:)];
+lambdaX = data.lambda(1,:);
 
-lambdaY = [data.lambda(2,:);data.lambda(2,:);data.lambda(2,:)];
+%lambdaY = [data.lambda(2,:);data.lambda(2,:);data.lambda(2,:)];
+lambdaY = data.lambda(2,:);
 
 OCP.ig.lambda = [lambdaX;lambdaY];
 %OCP.ig.lambda = data.lambda;
@@ -110,7 +112,7 @@ OCP.bounds.finalTime.ub = tF;
 % State:
 OCP.bounds.state.lb = [-10; -50; -2*pi*0; -inf(3,1)]; 
 OCP.bounds.state.ub = [10; 50; 2*pi*0; inf(3,1)];
-OCP.bounds.initState.lb = [0; -50; 0; 0; 0;0];
+OCP.bounds.initState.lb = [0; 5; 0; 0; 0;0];
 OCP.bounds.initState.ub = [0; 40; 0; 0; 0;0];
 OCP.bounds.finalState.lb = [-10; -50; -2*pi*0; -inf(3,1)];
 OCP.bounds.finalState.ub = [10; 50; 2*pi*0; inf(3,1)];
@@ -123,8 +125,8 @@ OCP.bounds.control.lb = -inf(1,1);
 OCP.bounds.control.ub = inf(1,1);
 
 % Contact forces:
-OCP.bounds.lambda.lb = -inf(6,1);
-OCP.bounds.lambda.ub = inf(6,1);
+OCP.bounds.lambda.lb = -inf(2,1);
+OCP.bounds.lambda.ub = inf(2,1);
 
 %% ----------------------------------------------------------
 %   SOLVER OPTIONS
@@ -191,14 +193,14 @@ guess = soln(end).guess;
 % Save results
 fileName = 'fallingBox_slanted_soln';
 overWrite = 0;
-Notes = 'Phi(x,y) not Phi(x,y,theta), 3 contact point';
+Notes = 'Phi(x,y,theta), 1 contact point';
 saveResults(solnFolderName, fileName, overWrite, soln,OCP,Notes)
 %% ----------------------------------------------------------
 %   PLOT RESULTS
 % -----------------------------------------------------------
 
 % Plot results
-fallingBox_plotResults2(t,z,lambda)
+fallingBox_plotResults(t,z,lambda)
 
 % Animate the results:
 % A.plotFunc = @(t,z)( drawModel(t,z,dyn) );

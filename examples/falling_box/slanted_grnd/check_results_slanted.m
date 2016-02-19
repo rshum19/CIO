@@ -21,7 +21,7 @@ addpath('helperFncs');
 %% ----------------------------------------------------------
 %   LOAD RESULTS
 % -----------------------------------------------------------
-data = load('fallingBox_slanted_soln11.mat');
+data = load('fallingBox_slanted_soln13.mat');
 soln = data.soln;
 
 OCP.model.params = params_fallingBox_model;
