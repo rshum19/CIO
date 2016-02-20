@@ -112,7 +112,7 @@ OCP.bounds.finalTime.ub = tF;
 % State:
 OCP.bounds.state.lb = [-10; -50; -2*pi*0; -inf(3,1)]; 
 OCP.bounds.state.ub = [10; 50; 2*pi*0; inf(3,1)];
-OCP.bounds.initState.lb = [0; 5; 0; 0; 0;0];
+OCP.bounds.initState.lb = [0; -50; 0; 0; 0;0];
 OCP.bounds.initState.ub = [0; 40; 0; 0; 0;0];
 OCP.bounds.finalState.lb = [-10; -50; -2*pi*0; -inf(3,1)];
 OCP.bounds.finalState.ub = [10; 50; 2*pi*0; inf(3,1)];
@@ -156,32 +156,32 @@ options(2).fminOpt = fminOpt;
 options(2).fminOpt.MaxFunEvals = 5e4;
 
 % %--- Interation 3
-% options(3).method = 'euler_mod';
-% options(3).nGrid = 100;
-% fminOpt.MaxFunEvals = 1e5;
-% options(3).fminOpt = fminOpt;
+options(3).method = 'euler_mod';
+options(3).nGrid = 50;
+options(3).fminOpt = fminOpt;
+options(3).fminOpt.MaxFunEvals = 5e6;
 
 % Display initial guess
 %displayIGnBnds(OCP.ig,OCP.bounds,options(1).nGrid);
 %% ----------------------------------------------------------
 %   SOLVE NLP PROBLEM
 % -----------------------------------------------------------
-
+soln(length(options)) = struct('info',[],'grid',[],'interp',[],'guess',[],'time',[]);
 for iter = 1:size(options,2)
-    fprintf('--------- Optimization Pass No.: %d ---------',iter)
+    fprintf('--------- Optimization Pass No.: %d ---------\n',iter)
     % Set options to pass to solver
     OCP.options = options(iter);
     
     % Solve Optimal control problem
     tic;
-    soln = OptCtrlSolver(OCP);
+    soln(iter) = OptCtrlSolver(OCP);
     time = toc;
     
     % save time of optimization
-    soln.time = time;
+    soln(iter).time = time;
     
     % Update initial condition
-    OCP.ig = soln.grid;
+    OCP.ig = soln(iter).grid;
 end
 
 t = soln(end).grid.time;
@@ -192,7 +192,7 @@ guess = soln(end).guess;
 
 % Save results
 fileName = 'fallingBox_slanted_soln';
-overWrite = 0;
+overWrite = 1;
 Notes = 'Phi(x,y,theta), 1 contact point';
 saveResults(solnFolderName, fileName, overWrite, soln,OCP,Notes)
 %% ----------------------------------------------------------

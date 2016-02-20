@@ -143,7 +143,7 @@ options(2).fminOpt = fminOpt;
 %   SOLVE NLP PROBLEM
 % -----------------------------------------------------------
 for iter = 1:size(options,2)
-    
+    fprintf('--------- Optimization Pass No.: %d ---------\n',iter)
     % Set options to pass to solver
     OCP.options = options(iter);
     

@@ -94,6 +94,7 @@ P.options = OPT.fminOpt;
 %% ----------------------------------------------------------
 %   SAVE RESULTS
 % -----------------------------------------------------------
+Soln = struct('info',[],'grid',[],'interp',[],'guess',[],'time',[]);
 % Fmincon output infomation
 Soln.info.fVal = fVal;
 Soln.info.exitFlag = exitFlag;
@@ -113,6 +114,7 @@ Soln.interp.control = @(t)( interp1(tSoln',uSoln',t','linear',nan)' );
 
 % Initial Guess
 Soln.guess = guess;
+
 
 end
 
