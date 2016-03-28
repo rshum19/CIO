@@ -1,24 +1,41 @@
-function [ defects ] = euler_backward(dt,y,f) 
+function [defects] = euler_backward(dt,z,F)
+%DYNAMICCONSTRAINTS
+%
+% Backward Euler integration
+%   q_{k}-q_{k+1} + dt*dq_{k+1} = 0
+%   dq_{k}-dq_{k+1} + dt*F_{k+1} = 0
+% where,
+%    F = D\(B*u + J'*lambda - C*q - G) = ddq
+%
+% INPUTS:
+%   dt:         length of the time step
+%   z:          stacked state vector z = [q;dq]
+%   F:          state second derivative F = ddq
+% OUTPUTS:
+%   defects:    this
 
-nTime = size(y,2);
-nStates = size(y,1)/2;
+%---------------------------------------------------
+% READ INPUT
+%---------------------------------------------------
+nStates = size(z,1)/2;
+nSteps = size(z,2);
 
-idxPrv = 1:(nTime-1);
-idxNxt = 2:nTime;
+q = z(1:nStates,:);
+dq = z(nStates+1:end,:);
 
-yPrv = y(:,idxPrv);
-yNxt = y(:,idxNxt);
+idxM = 1:(nSteps-1);
+idxP = 2:nSteps;
 
-fPrv = f(:,idxPrv);
-fNxt = f(:,idxNxt);
+%---------------------------------------------------
+% DEFECTS: BACKWARD EULER INTEGRATION
+%---------------------------------------------------
+%defects = [q(:,idxM) - q(:,idxP) + dt.*dq(:,idxP);...
+%           dq(:,idxM) - dq(:,idxP) + dt.*F(:,idxP)];
 
-% This is the key line:  (Euler Rule)
-defects = yPrv - yNxt + dt*fNxt;
-
+defects = zeros(size(z,1),size(z,2)-1);
+for i = 1:size(z,2)-1
+    defects(:,i) = z(:,i) - z(:,i+1) + dt*F(:,i+1);
+end
+%defects = reshape(defects,[numel(defects),1]);
 end
 
-% Backward Euler Integration sample
-% for i = 1:n
-%   t = t + h;
-%   y = (y + h*(1-t))/(1-4*h);
-% end

@@ -13,6 +13,8 @@ clc; clear; close all;
 
 % Add paths
 addpath('../');
+addpath('../../../');
+addpath('../../../methods');
 addpath('solutions');
 addpath('autogenFncs');
 addpath('wrapperFncs');
@@ -21,7 +23,7 @@ addpath('helperFncs');
 %% ----------------------------------------------------------
 %   LOAD RESULTS
 % -----------------------------------------------------------
-data = load('fallingBox_slanted_soln13.mat');
+data = load('fallingBox_slanted_soln16.mat');
 soln = data.soln;
 
 OCP.model.params = params_fallingBox_model;
@@ -71,6 +73,24 @@ plot(t,Phi,'*-')
 xlabel('Time [sec]')
 ylabel('\Phi(q) [m]');
 title('\Phi(q) function value')
+
+% Forward dynamics
+[f, Phi, Psi] = OCP.model.dynamics(t,x,u,lambda(2,:));
+figure
+plot(t,Phi,'*-')
+xlabel('Time [sec]')
+ylabel('\Phi(q) [m]');
+title('\Phi(q) function value')
+
+% Defects
+dt = (t(end)-t(1))/(length(t)-1);
+defects = euler_mod(dt,x,f);
+defectsVec = reshape(defects,numel(defects),1);
+
+figure
+plot(1:length(defectsVec),defectsVec,'*-');
+ylabel('Magnitude')
+title('Dynamics Defects');
 
 % Complementary constraints 
 [c_comp, ceq_comp] = OCP.compCst(Phi,Psi,t,x,u,lambda);

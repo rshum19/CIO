@@ -101,7 +101,6 @@ OCP.pathCst = [];
 OCP.bndCst = [];
 OCP.compCst = @(Phi,Gamma,t,x,u,lambda)fallingBox_compCst(Phi,Gamma,t,x,u,lambda,OCP.model.params);
 
-
 %----- Linear constraints
 % You can let time to be free by not setting any bounds on the final time
 OCP.bounds.initTime.lb = t0;
@@ -141,25 +140,25 @@ method = 'euler_mod';
 % Fmincon options:
 % for a full list of options refer to :
 %   http://www.mathworks.com/help/optim/ug/fmincon.html#inputarg_options
-fminOpt = optimoptions('fmincon','Display','iter','Algorithm','interior-point','MaxIter',3e3,'MaxFunEvals',1e4,'TolFun',1e-6);
+fminOpt = optimoptions('fmincon','Display','iter','Algorithm','sqp','MaxIter',3e3,'MaxFunEvals',1e4,'TolFun',1e-6);
 
 %--- Interation 1
-options(1).method = 'euler_mod';
+options(1).method = 'euler_back';
 options(1).nGrid = 20;
 options(1).fminOpt = fminOpt;
-options(1).fminOpt.TolCon = 1e-3;
+options(1).fminOpt.TolCon = 0.01;
 
 % %--- Interation 2
-options(2).method = 'euler_mod';
-options(2).nGrid = 50;
-options(2).fminOpt = fminOpt;
-options(2).fminOpt.MaxFunEvals = 5e4;
+% options(2).method = 'euler_mod';
+% options(2).nGrid = 50;
+% options(2).fminOpt = fminOpt;
+% options(2).fminOpt.MaxFunEvals = 5e4;
 
 % %--- Interation 3
-options(3).method = 'euler_mod';
-options(3).nGrid = 50;
-options(3).fminOpt = fminOpt;
-options(3).fminOpt.MaxFunEvals = 5e6;
+%options(3).method = 'euler_mod';
+%options(3).nGrid = 50;
+%options(3).fminOpt = fminOpt;
+%options(3).fminOpt.MaxFunEvals = 5e6;
 
 % Display initial guess
 %displayIGnBnds(OCP.ig,OCP.bounds,options(1).nGrid);
@@ -191,10 +190,10 @@ lambda = soln(end).grid.lambda;
 guess = soln(end).guess;
 
 % Save results
-fileName = 'fallingBox_slanted_soln';
-overWrite = 1;
-Notes = 'Phi(x,y,theta), 1 contact point';
-saveResults(solnFolderName, fileName, overWrite, soln,OCP,Notes)
+% fileName = 'fallingBox_slanted_soln';
+% overWrite = 1;
+% Notes = 'Phi(x,y,theta), 1 contact point';
+% saveResults(solnFolderName, fileName, overWrite, soln,OCP,Notes)
 %% ----------------------------------------------------------
 %   PLOT RESULTS
 % -----------------------------------------------------------

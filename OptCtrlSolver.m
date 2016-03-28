@@ -48,6 +48,8 @@ switch OPT.method
         defects = @euler_def;
     case 'euler_mod';
         defects = @euler_mod;
+    case 'euler_back';
+        defects = @euler_backward;
     case 'trapezoidal'
         defects = @trapezoid;
     case 'hermiteSimpson'
@@ -87,6 +89,7 @@ P.Aeq = []; P.beq = [];
 P.solver = 'fmincon';
 P.options = OPT.fminOpt;
 
+%Prob = ProbDef; 
 [zSoln, fVal,exitFlag,output] = fmincon(P);
 
 [tSoln,xSoln,uSoln,lambdaSoln] = unMux(zSoln,packSize);

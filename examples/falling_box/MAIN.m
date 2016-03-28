@@ -142,7 +142,7 @@ options(2).fminOpt = fminOpt;
 %% ----------------------------------------------------------
 %   SOLVE NLP PROBLEM
 % -----------------------------------------------------------
-for iter = 1:size(options,2)
+for iter = 1:1%size(options,2)
     fprintf('--------- Optimization Pass No.: %d ---------\n',iter)
     % Set options to pass to solver
     OCP.options = options(iter);
@@ -165,10 +165,10 @@ lambda = soln(end).grid.lambda;
 guess = soln(end).guess;
 
 % Save results
-fileName = 'fallingBox_soln';
-overWrite = 0;
-Notes = 'Working solution';
-saveResults(solnFolderName, fileName, overWrite, soln,OCP,Notes)
+% fileName = 'fallingBox_soln';
+% overWrite = 0;
+% Notes = 'Working solution';
+% saveResults(solnFolderName, fileName, overWrite, soln,OCP,Notes)
 %% ----------------------------------------------------------
 %   PLOT RESULTS
 % -----------------------------------------------------------

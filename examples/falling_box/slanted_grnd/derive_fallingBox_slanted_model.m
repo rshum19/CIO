@@ -1,4 +1,4 @@
-%% ----------------------------------------------------------
+% ----------------------------------------------------------
 %   INITIALIZE WORKSPACE
 % -----------------------------------------------------------
 clc; clear; close all;
@@ -19,6 +19,7 @@ syms I real
 syms x dx ddx real
 syms y dy ddy real
 syms th dth ddth real
+syms l real
 
 % Box dimensions 
 syms w real
@@ -31,6 +32,7 @@ syms c real
 q = [x; y; th];
 dq = [dx; dy; dth];
 line = [a,c];
+lambda = l;
 
 %% ----------------------------------------------------------
 %   DEFINE SYSTEM KINEMATICS
@@ -43,27 +45,19 @@ Pbtm = [x-w/2; y-h/2];
 Pcom = [x; y];
 
 % Cotnact points
-Pc1 = Pcom + h/2*[-sin(th);-cos(th)] + w/2*[-cos(th);sin(th)];
-Pc2 = Pcom - h/2*[sin(th);cos(th)];
-Pc3 = Pcom + h/2*[sin(th);cos(th)] + w/2*[cos(th);-sin(th)];
+R = [cos(th), -sin(th); sin(th), cos(th)];
+Pc1 = [x; y-h/2];
+Pc1 = Pcom + R*(Pc1-Pcom);
 
 % CoM velcoity
 Vcom= jacobian(Pcom,q)*dq;
 
-% Bottom of box surface velocity
-Vbtm = jacobian(Pcom,q)*dq;
-
 % Contact penetration distance
-phi1 = pt2line_dist(Pc1,line);
-phi2 = pt2line_dist(Pc2,line);
-phi3 = pt2line_dist(Pc3,line);
-phi1s = y - h/2;
-phi2s = y - h/2;
-phi3s = y - h/2;
+v1 = [1;0];
+v2 = [0;0];
+Phi =((v2(1)-v1(1))*(v1(2)-Pc1(2)) - (v1(1)-Pc1(1))*(v2(2)-v1(2)))/norm(v2-v1);
 
-Phi = phi1;
-%Phi = [phi1s; phi2s; phi3s];
-
+% Projection of constraint forces to generalized coordinates
 J = jacobian(Phi,q);
 
 Psi = J*dq;
@@ -108,6 +102,9 @@ C_mtx = simplify(C_mtx);
 Phi_0 = [];
 B_mtx = simplify(jacobian(Phi_0,q));
 B_mtx = B_mtx';
+
+% ddq
+ddq = D_mtx\(- G_vec + J'*lambda);
 %% ----------------------------------------------------------
 %   GENERATE MATLAB FUNCTIONS
 % -----------------------------------------------------------
@@ -126,10 +123,14 @@ params_list = {'w','h',...
 q_list = {'x','y','th'};
 dq_list = {'dx','dy','dth'};
 u_list = {'u1'};
+lambda_list = {'l'};
 line_coeff = {'a','c'};
 
 matlabFunction(D_mtx,C_mtx, G_vec, B_mtx,'File',fullfile(autoFolderName,'autogen_fallingBox_EOM_mtxs.m'),...
    'vars',horzcat(q_list,dq_list,params_list));
+
+matlabFunction(ddq,'File',fullfile(autoFolderName,'autogen_fallingBox_ddq.m'),...
+   'vars',horzcat(q_list,dq_list,lambda_list,params_list,line_coeff));
 
 % Generate Energy
 % ----------------

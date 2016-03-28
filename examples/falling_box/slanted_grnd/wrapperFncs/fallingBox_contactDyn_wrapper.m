@@ -10,9 +10,6 @@ phi1 = pt2line_dist(Pc1,p.line);
 phi2 = pt2line_dist(Pc2,p.line);
 phi3 = pt2line_dist(Pc3,p.line); 
 
-%Phi = phi1;
-
-
 [Phi,Psi,J] = autogen_contactDyn(z(1,:),z(2,:),z(3,:),...
                                  z(4,:),z(5,:),z(6,:),...
                                  p.w,p.h,...
